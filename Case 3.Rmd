@@ -1,0 +1,219 @@
+---
+title: "Case 3"
+author: "Tian Zhu"
+date: "November 12, 2018"
+output: word_document
+---
+```{r}
+#Data preparation
+
+summary(WHR2018)
+WHR18 <- WHR2018[, c(-1, -5, -6, -9)]
+write.csv(WHR18, 'WHR18.csv')
+View(WHR2018.1)
+summary(WHR18)
+
+#Subtitute NA in change7 by taking average of each region
+mean1 <- mean(WHR18$change7[which(WHR18$region == "Sub-Saharan Africa")], na.rm = TRUE)
+mean1
+WHR18$change7[which(WHR18$change7=="omit value")&&which(WHR18$region == 'Sub-Saharan Africa')] <- mean1
+mean2 <-mean(WHR18$change7[which(WHR18$region == 'Latin America and Caribbean')], na.rm = TRUE)
+mean3 <- mean(WHR18$change7[which(WHR18$region == 'South Asia')], na.rm = TRUE)
+mean4 <- mean(WHR18$change7[which(WHR18$region == 'Middle East and North Africa')], na.rm = TRUE)
+mean4 <- mean(WHR18$change7[which(WHR18$region == 'Southeast Asia')], na.rm = TRUE)
+mean5 <- mean(WHR18$change7[which(WHR18$region == 'Western Europe')], na.rm = TRUE)
+
+#Subtitute NA in LnGDPpc by taking average of each specific region
+mean6 <- mean(WHR18$LnGDPpc[which(WHR18$region == 'Western Europe')], na.rm = TRUE)
+WHR18$LnGDPpc[which(WHR18$LnGDPpc=="omit value")&&which(WHR18$region == 'Western Europe')] <- mean6
+mean7 <- mean(WHR18$LnGDPpc[which(WHR18$region == 'Sub-Saharan Africa')], na.rm = TRUE)
+WHR18$LnGDPpc[which(WHR18$LnGDPpc=="omit value")&&which(WHR18$region == 'Sub-Saharan Africa')] <- mean7
+mean8 <- mean(WHR18$LnGDPpc[which(WHR18$region == 'Middle East and North Africa')], na.rm = TRUE)
+WHR18$LnGDPpc[which(WHR18$LnGDPpc=="omit value")&&which(WHR18$region == 'Middle East and North Africa')] <- mean8
+mean9 <- mean(WHR18$LnGDPpc[which(WHR18$region == 'East Asia')], na.rm = TRUE)
+WHR18$LnGDPpc[which(WHR18$LnGDPpc == NA)&&which(WHR18$region == 'East Asia')] <- mean9
+WHR18$LnGDPpc[is.na.data.frame(which(WHR18$LnGDPpc=="NA")&&which(WHR18$region == 'East Asia'))] <- mean9
+
+#Substitute NA in LifeExp by taking average of specific region
+mean10 <- mean(WHR18$LifeExp[which(WHR18$region == 'East Asia')], na.rm = TRUE)
+mean11 <- mean(WHR18$LifeExp[which(WHR18$region == 'Central and Eastern Europe')], na.rm = TRUE)
+mean12 <- mean(WHR18$LifeExp[which(WHR18$region == 'Western Europe')], na.rm = TRUE)
+
+#Substitute NA in SocSupp by taking average of specific region
+mean13 <- mean(WHR18$SocSupp[which(WHR18$region == 'Middle East and North Africa')], na.rm = TRUE)
+
+#Substitute NA in SEsoc by taking average of specific region
+mean14 <- mean(WHR18$SEsoc[which(WHR18$region == 'Middle East and North Africa')], na.rm = TRUE)
+
+#Substitute NA in LifeChoice by taking average of specific region
+mean15 <- mean(WHR18$LifeChoice[which(WHR18$region == 'Middle East and North Africa')], na.rm = TRUE)
+
+#Substitute NA in SEchoice by taking average of specific region
+mean16 <- mean(WHR18$SEChoice[which(WHR18$region == 'Middle East and North Africa')], na.rm = TRUE)
+
+#Substitute NA in Generosity by taking average of specific region
+mean17 <- mean(WHR18$Generosity[which(WHR18$region == 'Middle East and North Africa')], na.rm = TRUE)
+
+#Substitute NA in SEGen by taking average of specific region
+mean18 <- mean(WHR18$SEGen[which(WHR18$region == 'Middle East and North Africa')], na.rm = TRUE)
+
+#Substitute NA in Corruption by taking average of specific region 
+mean19 <- mean(WHR18$Corruption[which(WHR18$region == 'Middle East and North Africa')], na.rm = TRUE)
+mean20 <- mean(WHR18$Corruption[which(WHR18$region == 'East Asia')], na.rm = TRUE)
+mean21 <- mean(WHR18$Corruption[which(WHR18$region == 'Commonwealth of Independent States')], na.rm = TRUE)
+
+#Substitute NA in SECorr by taking average of specific region
+mean22 <- mean(WHR18$SECorr[which(WHR18$region == 'Middle East and North Africa' )], na.rm = TRUE)
+mean23 <- mean(WHR18$SECorr[which(WHR18$region == 'East Asia')], na.rm = TRUE)
+mean24 <- mean(WHR18$SECorr[which(WHR18$region == 'Commonwealth of Independent States')], na.rm = TRUE)
+
+#read new WHR18
+WHR18 <- read.csv('c:/Users/zttzhu/My R Work/case3-clustering-b/WHR18.csv')
+summary(WHR18)
+row.names(WHR18)<-WHR18[,1]
+WHR18 <- WHR18[, c(-1,-3)]
+WHR18a <- WHR18[, c(-1,-2)]
+View(WHR18)
+View(WHR18a)
+```
+
+```{r}
+#Part 1
+#Hierarchial model
+d1 <- dist(WHR18a, method = "euclidean")
+WHR18a.norm <- sapply(WHR18a, scale)
+summary(WHR18a.norm)
+d1 <- dist(WHR18a.norm, method = "euclidean")
+hclust.WHR18a <- hclust(d1, method = 'average')
+summary(hclust.WHR18a)
+plot(hclust.WHR18a, main = "Average", cex = 0.5)%>%abline(h = 6, col = "red")
+cut.WHR18a <- cutree(hclust.WHR18a, k = 4)
+table(cut.WHR18a)
+summary(cut.WHR18a)
+cut.WHR18a
+```
+
+```{r}
+#k-means model
+km.WHR18a <- kmeans(WHR18a.norm, centers = 4, nstart = 20)
+print(km.WHR18a$cluster)
+print(km.WHR18a)
+plot(WHR18a.norm[, c("LnGDPpc", "LifeExp")], col = km.WHR18a$cluster, main = 'k-means with 4 clusters')
+wss <- 0
+# For 3 to 8 cluster centers
+for (i in 1:8) {
+  km.WHR18a <- kmeans(WHR18a.norm, centers = i)
+  # Save total within sum of squares to wss variable
+  wss[i] <- km.WHR18a$tot.withinss
+}
+View(wss)
+# Plot total within sum of squares vs. number of clusters
+plot(1:8, wss, type = "b", 
+     xlab = "Number of Clusters", 
+     ylab = "Within groups sum of squares")
+km.WHR18a <- kmeans(WHR18a.norm, centers = 4)
+table(km.WHR18a$cluster)
+plot(WHR18a.norm[,c("LnGDPpc", "Corruption")],
+     col = km.WHR18a$cluster,
+     main = "K-mean cluster of World Happiness Score",
+     xlab = "LnGDP",
+     ylab = "Corruption")
+```
+```{r}
+#Heatmap for part 1
+hclust1 <- function(WHR18a.norm, method = "average")
+  hclust(WHR18a.norm, method = "average")
+dist1 <- function(WHR18a.norm, method = "euclidean")
+   as.dist(1-cor(t(WHR18a.norm), method="pearson"))
+heatmap(as.matrix(WHR18a.norm), distfun = dist1, hclustfun = hclust1,
+        col=rev(paste("gray", 1:99, sep = "")))
+```
+
+
+
+```{r}
+#Part 2: hierarchial model
+d2 <- dist(WHR18, method = "euclidean")
+WHR18.norm <- sapply(WHR18, scale)
+summary(WHR18.norm)
+d2 <- dist(WHR18.norm, method = "euclidean")
+hclust.WHR18 <- hclust(d2, method = 'average')
+summary(hclust.WHR18)
+plot(hclust.WHR18, main = "Average", cex = 0.5)%>%abline(h = 6, col = "red")
+cut.WHR18 <- cutree(hclust.WHR18, k = 4)
+table(cut.WHR18)
+summary(cut.WHR18)
+cut.WHR18
+```
+
+```{r}
+#k-mean model
+km.WHR18 <- kmeans(WHR18.norm, centers = 4, nstart = 20)
+print(km.WHR18$cluster)
+print(km.WHR18)
+plot(WHR18.norm[, c("LnGDPpc", "LifeExp")], col = km.WHR18$cluster, main = 'k-means with 4 clusters')
+wss <- 0
+# For 3 to 8 cluster centers
+for (i in 1:8) {
+  km.WHR18 <- kmeans(WHR18.norm, centers = i)
+  # Save total within sum of squares to wss variable
+  wss[i] <- km.WHR18$tot.withinss
+}
+View(wss)
+# Plot total within sum of squares vs. number of clusters
+plot(1:8, wss, type = "b", 
+     xlab = "Number of Clusters", 
+     ylab = "Within groups sum of squares")
+km.WHR18 <- kmeans(WHR18.norm, centers = 4)
+table(km.WHR18$cluster)
+plot(WHR18.norm[,c("LnGDPpc", "LifeLadder")],
+     col = km.WHR18$cluster,
+     main = "K-mean cluster of World Happiness Score",
+     xlab = "LnGDPpc",
+     ylab = "LifeLadder")
+```
+
+```{r}
+#Number of Countries in 4 cluster in hierarchial method
+
+#Number of Countries in 4 cluster in K-means method
+
+```
+
+```{r}
+#Heatmap for part 2
+hclust2 <- function(WHR18.norm, method = "average")
+  hclust(WHR18.norm, method = "average")
+dist2 <- function(WHR18.norm, method = "euclidean")
+   as.dist(1-cor(t(WHR18.norm), method="pearson"))
+heatmap(as.matrix(WHR18.norm), distfun = dist2, hclustfun = hclust2,
+        col=rev(paste("gray", 1:99, sep = "")))
+#Centroid 
+plot(c(0),xaxt = 'n', ylab = "", type = "l",
+     ylim = c(min(km.WHR18$centers), max(km.WHR18$centers)), xlim = c(0,14))
+
+axis(1, at = c(1:14), labels = names(WHR18))
+```
+
+```{r}
+#Comparsion between part 1 and part 2
+#Hierarchical Model
+table(cut.WHR18a, cut.WHR18)
+#K-means Model
+table(km.WHR18a$cluster, km.WHR18$cluster)
+
+```
+
+```{r}
+#List five countries in each cluster, here we prefer hierarchial method.
+#Hierarchial method
+#cluster 1: Afghanistan, Albania, 
+
+
+```
+
+
+
+
+
+
